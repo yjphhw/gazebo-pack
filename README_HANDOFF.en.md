@@ -20,7 +20,9 @@ gazebo_models/<name>_XX/       ← artifacts: model.sdf + model.config + <name>_
 worlds/<name>_world.sdf        ← artifact: ready-to-run gz sim scene
 ```
 
-**Artifacts are disposable; the asset package is the source.**
+**Artifacts are disposable; the asset package is the source.** The repo only commits
+asset packages — a fresh clone has no `gazebo_models/` or `worlds/`; generate them by
+running the two commands from §3 once (or the one-liner in §2).
 
 ## 1. Environment (one-time)
 
@@ -41,14 +43,16 @@ $BLENDER --version
 ## 2. Run the shipped example first (no modeling)
 
 This repo ships `assets/coke_bottle`: a 0.08×0.08×0.25 m red cola bottle,
-1 dynamic instance, mesh collision.
+1 dynamic instance, mesh collision. The repo only commits asset packages, so the
+artifact directories are **built, not cloned** — full sequence:
 
 ```bash
+python3 gazebo_pack.py build assets/coke_bottle --world   # 1) generates gazebo_models/ + worlds/
 export GZ_SIM_RESOURCE_PATH=$PWD/gazebo_models:$GZ_SIM_RESOURCE_PATH
 export SDF_PATH=$PWD/gazebo_models:$SDF_PATH
 
-gz sdf -k worlds/coke_bottle_world.sdf     # expect "Valid." (an inertia warning may precede it — normal)
-gz sim -r worlds/coke_bottle_world.sdf     # GUI: the red bottle standing on the ground
+gz sdf -k worlds/coke_bottle_world.sdf     # 2) expect "Valid." (an inertia warning may precede it — normal)
+gz sim -r worlds/coke_bottle_world.sdf     # 3) GUI: the red bottle standing on the ground
 ```
 
 Expected: `coke_bottle_00` near the origin, bottom on the ground, texture visible.
@@ -220,11 +224,14 @@ assets/coke_bottle/
 ├── gen_coke_label.py        ← texture script (re-run after editing W/H/text)
 ├── render_preview.py        ← optional preview render
 └── preview.png              ← preview image
-gazebo_models/coke_bottle_00/   ← step-2 artifact (regenerable, don't hand-edit)
-worlds/coke_bottle_world.sdf    ← step-2 artifact
+gazebo_models/coke_bottle_00/   ← step-2 artifact (regenerable, don't hand-edit; not committed, appears after build)
+worlds/coke_bottle_world.sdf    ← step-2 artifact (same)
 blender_export.py               ← step-1 exporter (no third-party deps)
 gazebo_pack.py                  ← step-2 validator/packer (PyYAML only)
 ```
+
+(`gazebo_models/` and `worlds/` are not in git; run
+`python3 gazebo_pack.py build assets/<name> --world` once after cloning.)
 
 For a quick look without Gazebo: `$BLENDER --background --python assets/coke_bottle/render_preview.py`
 → writes `assets/coke_bottle/preview.png`.

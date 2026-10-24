@@ -19,7 +19,8 @@ gazebo_models/<name>_XX/       ← 产物：model.sdf + model.config + <name>_XX
 worlds/<name>_world.sdf        ← 产物：可直接 gz sim 跑的场景
 ```
 
-**产物随时可删掉重建；资产包才是源。**
+**产物随时可删掉重建；资产包才是源。** 仓库只提交资产包——clone 下来没有
+`gazebo_models/` 和 `worlds/`，先跑一次 §3 的两条命令生成（或 §2 一步到位）。
 
 ## 1. 环境（一次性）
 
@@ -39,13 +40,15 @@ $BLENDER --version
 ## 2. 先跑现成示例（不用建模）
 
 本仓库自带 `assets/coke_bottle`：0.08×0.08×0.25 m 红色可乐瓶，1 个动态实例，mesh 碰撞。
+仓库只提交资产包，**产物目录是 build 出来的**——完整三步：
 
 ```bash
+python3 gazebo_pack.py build assets/coke_bottle --world   # ① 生成 gazebo_models/ + worlds/
 export GZ_SIM_RESOURCE_PATH=$PWD/gazebo_models:$GZ_SIM_RESOURCE_PATH
 export SDF_PATH=$PWD/gazebo_models:$SDF_PATH
 
-gz sdf -k worlds/coke_bottle_world.sdf     # 看到 Valid. 即可（前面可能带一条惯量警告，正常）
-gz sim -r worlds/coke_bottle_world.sdf     # GUI：红色可乐瓶立在地面
+gz sdf -k worlds/coke_bottle_world.sdf     # ② 看到 Valid. 即可（前面可能带一条惯量警告，正常）
+gz sim -r worlds/coke_bottle_world.sdf     # ③ GUI：红色可乐瓶立在地面
 ```
 
 应看到：`coke_bottle_00` 在原点附近、瓶底贴地、贴图正常。
@@ -207,11 +210,14 @@ assets/coke_bottle/
 ├── gen_coke_label.py        ← 贴图脚本（改 W/H/文案重跑）
 ├── render_preview.py        ← 预览渲染（可选）
 └── preview.png              ← 预览图
-gazebo_models/coke_bottle_00/   ← ② 产物（可再生，别手改）
-worlds/coke_bottle_world.sdf    ← ② 产物
+gazebo_models/coke_bottle_00/   ← ② 产物（可再生，别手改；未提交，build 后出现）
+worlds/coke_bottle_world.sdf    ← ② 产物（同上）
 blender_export.py               ← ① 导出器（无第三方依赖）
 gazebo_pack.py                  ← ② 校验/打包器（只依赖 PyYAML）
 ```
+
+（`gazebo_models/` 与 `worlds/` 不进 git；clone 后先跑一次
+`python3 gazebo_pack.py build assets/<name> --world` 生成。）
 
 想先看外观（不启动 Gazebo）：`$BLENDER --background --python assets/coke_bottle/render_preview.py`
 → 生成 `assets/coke_bottle/preview.png`。
