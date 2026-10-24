@@ -1,0 +1,42 @@
+# 可口可乐瓶 — 资产包交接单（MANIFEST_SPEC v1.0）
+# brief 原文写了 0.8×0.6×0.75m（疑为抄了规范 §1 的桌子示例）；用户 2026-10-23
+# 确认按真实可乐瓶比例交付：0.08 × 0.08 × 0.25 m。
+schema_version: 1
+kind: model-package
+name: coke_bottle
+description: "可口可乐弧形瓶（contour bottle），直径 0.08 m、高 0.25 m，红底白字手写体 logo"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/coke_bottle.glb
+      instance: "00"          # 引号必加（YAML 00 会被读成 0）
+
+mass: 0.8                     # kg —— 满瓶可乐估值（网格体积 0.748 L × 1.04 + 瓶身 ≈ 0.8）
+inertia: auto                 # 网格体积积分（C1/C2），需 sdf ≥ 1.11
+static: false                 # brief 未说静态 → 默认动态
+
+geometry:
+  size: [0.08, 0.08, 0.25]    # 与建模脚本 SIZE 逐值一致（validator V4 对账）
+
+collision:
+  type: mesh                  # brief 指定 mesh
+  optimization: convex_hull   # 默认值（A3：动态 mesh 必须凸化）
+
+frame:
+  origin: center              # 默认；glb AABB 中心 = 原点（V5）
+  # visual_pose 不写 = 层①默认 roll +90°（B1：glTF Y-up → Gazebo Z-up）
+
+gazebo:
+  sdf_version: "1.11"
+
+world:
+  name: coke_bottle_world
+  layout:
+    type: grid
+    cols: 1                   # 单件，居中
+    # pitch 默认 2×max(size) = 0.5
+    # z 默认 auto → center 原点 → z = 0.125 贴地
+  ground: true
+  sun: true
+  plugins: default

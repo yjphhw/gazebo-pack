@@ -1,0 +1,41 @@
+# 猎鹰 9 号 — 资产包交接单（MANIFEST_SPEC v1.0）
+# brief: 建模：猎鹰9火箭，建模和贴图要精美（未给尺寸/动态性/碰撞）
+schema_version: 1
+kind: model-package
+name: falcon9
+description: "猎鹰 9 号 Block 5：高 70 m、整流罩 φ5.2 m；白色箭体/黑色级间段/9 台 Merlin/4 条着陆腿/4 片栅格舵"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/falcon9.glb
+      instance: "00"          # 引号必加（YAML 00 会读成 0）
+
+static: true                  # 展示用火箭；70 m 细高体做动态不现实（见回复说明）
+# mass / inertia 省略：static 时不写 inertial
+
+geometry:
+  size: [5.2, 5.2, 70.0]      # AABB：φ5.2 整流罩 × 70 m 高
+
+collision:
+  type: mesh
+  optimization: convex_hull   # 静态展示默认；凸包会填平级间台阶（视觉无关）
+                              # 要按真实外形做 LiDAR 接触：static 下可改 none
+
+frame:
+  origin: center              # AABB 中心 = 原点（V5）
+  # visual_pose 不写 = 层①默认 roll +90°
+
+gazebo:
+  sdf_version: "1.11"
+
+world:
+  name: falcon9_world
+  layout:
+    type: grid
+    cols: 1
+    # pitch 默认 2×max(size) = 140
+    # z 默认 auto → center → z = 35（不做仿真贴地验证，见 §7 纪律 8）
+  ground: true
+  sun: true
+  plugins: default

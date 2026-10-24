@@ -1,0 +1,6 @@
+gazebo_models/
+worlds/
+__pycache__/
+*.blend1
+nohup.out
+*.log

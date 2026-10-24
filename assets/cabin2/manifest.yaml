@@ -1,0 +1,55 @@
+# =============================================================
+# assets/cabin/manifest.yaml — 资产包交接单
+#   规范: ../../MANIFEST_SPEC.md   事实卡片: ../../PACK_NOTES.md
+#   brief: 小木屋 2×3×3m 精美贴图 1 个动态 collision 默认
+#   建模: ../../make_cabin.py (20 件 EXACT union, 水密)
+#         ../../make_cabin_textures.py (5 张程序化贴图, 已 pack)
+# =============================================================
+
+schema_version: 1
+kind: model-package
+name: cabin2
+description: "Log cabin 2x3x3m, gable roof, 2 doors 6 windows, packed textures"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/cabin2.glb
+      instance_count: 1                  # → 实例 "0" → gazebo_models/cabin_0
+
+# ── 物理 ───────────────────────────────────────────────
+mass: 800.0                      # [kg] 默认值: 实体木壳 19m³ 量级的小屋, 真实木屋
+                                 #      300~1000kg 区间取中; 想当"道具屋"改 static:true 更省
+inertia: auto                    # 外壳水密 → 体积积分成立; 惯量按 mass=800 缩放
+static: false                    # brief: 动态 (可被推动/撞倒)
+
+# ── 几何 ───────────────────────────────────────────────
+geometry:
+  size: [2.072, 3.06, 3.0]       # 实测: 屋顶四向挑檐 3.6cm → x=2.072; 檐口挑出 → y=3.06;
+                                 # 烟囱顶 z=3.0 撑满高. 门窗左右/前后对称 → 中心原点不偏
+
+# ── 碰撞 (brief 槽位5 = 默认 → mesh + convex_hull) ─────
+collision:
+  type: mesh
+  optimization: convex_decomposition      # 屋子本体近凸(盒体+坡顶), 凸包贴合度极好;
+                                 # 推/撞/当障碍都真实, 不需要 decomposition
+
+# ── 坐标与轴向 ─────────────────────────────────────────
+frame:
+  origin: center                 # bbox 中心归零 (屋底 z=-1.5)
+visual_pose: [0, 0, 0, 1.57079632679, 0, 0]   # roll+90° (B1); 建模约定门朝 +Y
+                                 # → 映射后门朝 SDF +Y
+
+# ── Gazebo 输出 ────────────────────────────────────────
+gazebo:
+  sdf_version: "1.11"
+
+# ── world 场景 (--world 时生成) ────────────────────────
+world:
+  name: cabin2_world
+  layout:
+    type: grid
+    cols: 1
+    rows: 1
+    pitch: 6.0                   # 单实例, pitch 无实际作用
+    z: auto                      # center 原点 → z = size_z/2 = 1.5 → 屋底贴地

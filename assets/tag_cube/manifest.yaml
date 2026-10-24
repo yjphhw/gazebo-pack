@@ -1,0 +1,103 @@
+# =============================================================
+# assets/tag_cube/manifest.yaml — 资产包交接单
+#   规范: ../../MANIFEST_SPEC.md (v1.0)   事实卡片: ../../PACK_NOTES.md
+#   这是"建模方(AI)"与"gazebo_pack.py"之间唯一的机器可读契约。
+#   每个字段后面的中文注释标注: 默认值依据 → PACK_NOTES 章节编号。
+# =============================================================
+
+# ── 元信息 (MANIFEST_SPEC §3) ──────────────────────────
+schema_version: 1              # [必需] 工具遇到更高版本直接报错 (前向兼容)
+kind: model-package            # [必需] v1 唯一类型: 模型资产包
+name: tag_cube                 # [必需] ^[a-z][a-z0-9_]*$ → 目录 <name>_<instance>
+description: "AprilTag 36h11 tag cube, 0.1m cube, tag on top face (+Z)"
+
+# ── 源文件 ─────────────────────────────────────────────
+source:
+  blend: model.blend           # [可选] 返工用源场景; 工具只查存在性, 不解析
+  meshes:                      # [必需] 每项 = 一个网格文件 → 展开成一个模型目录
+    - file: source/tag_00.glb  #         相对资产包根; 由 blender_export.py 产出
+      instance: "00"           # [必需] 引号必加! 不带引号 YAML 会把 00 读成整数 0
+    - file: source/tag_01.glb
+      instance: "01"
+    - file: source/tag_02.glb
+      instance: "02"
+    - file: source/tag_03.glb
+      instance: "03"
+    - file: source/tag_04.glb
+      instance: "04"
+    - file: source/tag_05.glb
+      instance: "05"
+    - file: source/tag_06.glb
+      instance: "06"
+    - file: source/tag_07.glb
+      instance: "07"
+    - file: source/tag_08.glb
+      instance: "08"
+    - file: source/tag_09.glb
+      instance: "09"
+    - file: source/tag_10.glb
+      instance: "10"
+    - file: source/tag_11.glb
+      instance: "11"
+    - file: source/tag_12.glb
+      instance: "12"
+    - file: source/tag_13.glb
+      instance: "13"
+    - file: source/tag_14.glb
+      instance: "14"
+    - file: source/tag_15.glb
+      instance: "15"
+    - file: source/tag_16.glb
+      instance: "16"
+    - file: source/tag_17.glb
+      instance: "17"
+    - file: source/tag_18.glb
+      instance: "18"
+    - file: source/tag_19.glb
+      instance: "19"
+    - file: source/tag_20.glb
+      instance: "20"
+    - file: source/tag_21.glb
+      instance: "21"
+    - file: source/tag_22.glb
+      instance: "22"
+    - file: source/tag_23.glb
+      instance: "23"
+
+# ── 物理参数 ───────────────────────────────────────────
+mass: 0.1                      # [kg] 必需(static=false 时) → 缩放 auto 惯量到此值 [PACK_NOTES C1]
+inertia: auto                  # 需 sdf>=1.11 [A2]; collision=mesh 时按网格体积积分 → 须水密 [C2]
+static: false                  # false=受重力掉落的动态刚体
+
+# ── 几何 ───────────────────────────────────────────────
+geometry:
+  size: [0.1, 0.1, 0.1]        # [m] 建模实际尺寸 → validator 用它核对 glb 包围盒 (防改模忘改单)
+
+# ── 碰撞 (用户拍板 2026-10: 默认 mesh) ──────────────────
+collision:
+  type: mesh                    # mesh(默认) | box | primitives [MANIFEST_SPEC §4]
+  optimization: convex_hull    # 动态刚体必须凸化 [A3]; 桌椅等凹模型可改 convex_decomposition
+  # convex_decomposition:      # 仅 optimization=convex_decomposition 时展开, 规范默认 16/200000
+  #   max_convex_hulls: 16
+  #   voxel_resolution: 200000
+
+# ── 坐标与轴向 ─────────────────────────────────────────
+frame:
+  origin: center               # center(默认) | bottom-center → validator 按此查原点 [B2 铁律]
+visual_pose: [0, 0, 0, 1.57079632679, 0, 0]
+                               # roll +90°: glTF Y-up → Gazebo Z-up 的轴向修正 (层①通病默认) [B1]
+                               # 只旋转 visual; 立方体各向同性, collision 不受影响
+
+# ── Gazebo 输出 ────────────────────────────────────────
+gazebo:
+  sdf_version: "1.11"           # Harmonic/sdformat14; auto 惯量的最低版本 [A2]
+
+# ── world 场景 (--world 时生成) ────────────────────────
+world:
+  name: tag_cubes              # → worlds/tag_cubes.sdf (文件名=元素名)
+  layout:
+    type: grid                 # grid(默认) | line | explicit
+    cols: 6                    # 6x4=24, 与实例数一致 (不符 → V11 报错)
+    rows: 4
+    pitch: 0.15                # 中心距 = 边长 0.1 + 间隙 0.05 (与旧版黄金产物一致)
+    z: auto                    # auto: center 原点 → z=size_z/2=0.05 底面贴地

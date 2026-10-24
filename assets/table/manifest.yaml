@@ -1,0 +1,46 @@
+# ============================================================================
+# assets/table/manifest.yaml — 浅木色书桌, 1 个静态摆件 (MANIFEST_SPEC v1.0)
+# brief: 建模：桌子，0.8×0.6×0.75m，浅木色，1个静态摆件，collision 默认
+# ============================================================================
+
+schema_version: 1
+kind: model-package
+name: table
+description: "浅木色书桌 0.8x0.6x0.75m 静态摆件"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/table.glb
+      instance: "0"            # 引号必加 (YAML 裸 0 也能读, 但保持全包统一风格)
+
+mass: 25.0                     # [AI 估算] 实木书桌 ≈ 25kg。static:true 下 SDF
+                               # 不写 inertial, 此值仅作记录, 不参与仿真。
+static: true                   # brief: "1个静态摆件"
+inertia: auto                  # 静态无需惯量; 保留 auto 以便将来转动态
+
+geometry:
+  size: [0.8, 0.6, 0.75]       # 实测 bbox = 0.8000 x 0.6000 x 0.7500
+
+collision:
+  type: mesh                   # 默认块 = mesh (2026-10 用户拍板)
+  optimization: convex_hull    # 默认; 桌子是凹体(腿间空腔), 凸包会填实腿间空间。
+                               # 需要"椅子塞进桌下"类真实凹接触时改
+                               # convex_decomposition (VHACD)。静态摆件默认 convex_hull。
+
+frame:
+  origin: center               # 默认; 几何中心 = 原点 (实测偏差 1.5e-8)
+
+gazebo:
+  sdf_version: "1.11"          # Harmonic / sdformat14
+
+world:                         # --world 时生效
+  name: table_world
+  layout:
+    type: grid
+    cols: 1
+    pitch: 1.6                 # 默认 2×max(size)=2×0.8; 单个实例用不上, 显式写出
+    z: auto                    # center → z = size_z/2 = 0.375, 底面正好落在地面
+  ground: true
+  sun: true
+  plugins: default

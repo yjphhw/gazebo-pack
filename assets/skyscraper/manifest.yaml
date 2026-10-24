@@ -1,0 +1,41 @@
+# 摩天大楼 — 资产包交接单（MANIFEST_SPEC v1.0）
+# brief: "生成一个摩天大楼的模型"（未给尺寸/材质/动态性 → 按 §4 补并显式告知）
+schema_version: 1
+kind: model-package
+name: skyscraper
+description: "摩天大楼：9×9 m 退台塔楼，高 60 m；玻璃幕墙 + 金属冠顶/尖顶"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/skyscraper.glb
+      instance: "00"          # 引号必加（YAML 00 会读成 0）
+
+static: true                  # 建筑 = 静态摆件；无需 mass/inertia（§4）
+# mass / inertia 省略：static 时不写 inertial
+
+geometry:
+  size: [9.0, 9.0, 60.0]      # 与建模脚本 SIZE 一致（V4 对账）
+
+collision:
+  type: mesh                  # 默认 mesh
+  optimization: convex_hull   # 默认；退台会被凸包填平（静态建筑通常无所谓）
+                              # 要 LiDAR/射线级别的退台接触：static 下可改 none
+
+frame:
+  origin: center              # AABB 中心 = 原点（V5）
+  # visual_pose 不写 = 层①默认 roll +90°
+
+gazebo:
+  sdf_version: "1.11"
+
+world:
+  name: skyscraper_world
+  layout:
+    type: grid
+    cols: 1                   # 单件
+    # pitch 默认 2×max(size) = 120
+    # z 默认 auto → center → z = 30（贴地；不做仿真贴地验证，见 §7 纪律 8）
+  ground: true
+  sun: true
+  plugins: default

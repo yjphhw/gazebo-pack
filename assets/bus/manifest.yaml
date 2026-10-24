@@ -1,0 +1,38 @@
+collision:
+  type: box
+description: 城市公交 10.5x2.5x3.05m (载客30~40人比例), 精细贴图, 动态, box 碰撞=车体精确外包络
+frame:
+  origin: center
+  visual_pose:
+  - 0
+  - 0
+  - 0
+  - 1.57079632679
+  - 0
+  - 0
+gazebo:
+  sdf_version: '1.11'
+geometry:
+  size:
+  - 10.5
+  - 2.5
+  - 3.05
+inertia: auto
+kind: model-package
+mass: 12000.0
+name: bus
+schema_version: 1
+source:
+  blend: model.blend
+  meshes:
+  - file: source/bus.glb
+    instance: '0'
+static: false
+world:
+  ground: true
+  layout:
+    cols: 1
+    type: grid
+  name: bus_world
+  plugins: default
+  sun: true

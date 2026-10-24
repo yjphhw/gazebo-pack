@@ -1,0 +1,47 @@
+collision:
+  type: primitives
+  # pose 在 link 系 (原点=模型中心, z=0.72 离地); 世界坐标 - 0.72 = link 坐标
+  primitives:
+  # 车身 (世界 z 0.30..1.44)
+  - {shape: box, size: [4.69, 1.85, 1.14], pose: [0, 0, 0.15, 0, 0, 0]}
+  # 4 轮胎 (圆柱 r=0.33 宽 0.24, 底贴地, 轴沿 Y → roll 90°)
+  - {shape: cylinder, radius: 0.33, length: 0.24, pose: [1.45, 0.75, -0.39, 1.57079632679, 0, 0]}
+  - {shape: cylinder, radius: 0.33, length: 0.24, pose: [1.45, -0.75, -0.39, 1.57079632679, 0, 0]}
+  - {shape: cylinder, radius: 0.33, length: 0.24, pose: [-1.45, 0.75, -0.39, 1.57079632679, 0, 0]}
+  - {shape: cylinder, radius: 0.33, length: 0.24, pose: [-1.45, -0.75, -0.39, 1.57079632679, 0, 0]}
+description: Tesla Model 3 4.69x1.85x1.44m (真实轿车尺寸), 精细贴图, 动态, primitives 碰撞(车身盒+4轮); 实测 mesh+convex_hull 漂移 +1.5cm/22s, 弃用
+frame:
+  origin: center
+  visual_pose:
+  - 0
+  - 0
+  - 0
+  - 1.57079632679
+  - 0
+  - 0
+gazebo:
+  sdf_version: '1.11'
+geometry:
+  size:
+  - 4.69
+  - 1.85
+  - 1.44
+inertia: auto
+kind: model-package
+mass: 1800.0
+name: tesla_model3
+schema_version: 1
+source:
+  blend: model.blend
+  meshes:
+  - file: source/tesla_model3.glb
+    instance: '0'
+static: false
+world:
+  ground: true
+  layout:
+    cols: 1
+    type: grid
+  name: tesla_model3_world
+  plugins: default
+  sun: true

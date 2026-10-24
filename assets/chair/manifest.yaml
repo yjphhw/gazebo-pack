@@ -1,0 +1,58 @@
+# =============================================================
+# assets/chair/manifest.yaml — 资产包交接单
+#   规范: ../../MANIFEST_SPEC.md (v1.0)   事实卡片: ../../PACK_NOTES.md
+#   brief: 椅子 45×45×90cm 白蜡木 4 个动态 collision 默认
+#   建模脚本: ../../make_chair.py (20 件榫卯重叠 + EXACT union, 可复跑)
+# =============================================================
+
+schema_version: 1
+kind: model-package
+name: chair                      # → 目录 chair_0 .. chair_3
+description: "Ash wood chair, 0.45x0.45x0.90m, slatted seat, back faces -Y"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/chair.glb     # 同一份网格复制给 4 个实例 (§3 instance_count)
+      instance_count: 4
+
+# ── 物理 ───────────────────────────────────────────────
+mass: 4.0                        # [kg] 白蜡木餐椅常见 3.5~5kg, 取 4.0 (默认值, 可改)
+inertia: auto                    # 按网格体积积分再缩放到 mass → 网格已水密 (union)
+static: false                    # 动态: 受重力, 可被推动
+
+# ── 几何 ───────────────────────────────────────────────
+geometry:
+  size: [0.45, 0.45, 0.9]        # V4 将逐轴向核对 glb 实测包围盒
+
+# ── 碰撞 (brief 槽位5 = "默认" → §4 默认: mesh + convex_hull) ──
+collision:
+  type: mesh
+  optimization: convex_decomposition      # ⚠ 注意: 椅子是凹体, 凸包会把"座面下方空腔"填实!
+                                 #   直立摆放/推倒滑动都没问题 (底点=腿, 顶=靠背);
+                                 #   若要真实"桌子底下塞椅子"式接触, 改成:
+                                 #   optimization: convex_decomposition
+                                 #   (工具会走 VHACD 分解, 参数默认 16 hull/200k voxel)
+
+# ── 坐标与轴向 ─────────────────────────────────────────
+frame:
+  origin: center                 # 导出器把整椅 bbox 中心归零 (腿底 z=-0.45)
+  # 注意这里没有 visual_pose! 见下方顶层 visual_pose 注释
+
+# visual_pose = roll +90° (B1 层①通病默认): glb 里"天"是 +Y (glTF Y-up),
+# 旋到 SDF 的 +Z。映射: up→+Z, 椅背(建模 -Y)→SDF -Y。
+visual_pose: [0, 0, 0, 1.57079632679, 0, 0]
+
+# ── Gazebo 输出 ────────────────────────────────────────
+gazebo:
+  sdf_version: "1.11"
+
+# ── world 场景 (--world 时生成) ────────────────────────
+world:
+  name: chairs
+  layout:
+    type: grid
+    cols: 2                      # 2×2 方阵, 4 把椅子
+    rows: 2
+    pitch: 0.8                   # 中心距: 椅宽 0.45 + 间隙 0.35, 倒下也碰不到邻居
+    z: auto                      # center 原点 → z = size_z/2 = 0.45, 腿底正好贴地

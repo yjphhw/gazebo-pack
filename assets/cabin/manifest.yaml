@@ -1,0 +1,49 @@
+# ── 元信息 ───────────────────────────────────────────
+schema_version: 1
+kind: model-package
+name: cabin
+description: "2x3x3m 墙体内芯小木屋, 含屋檐 bbox 2.44x3.58x3.33, 动态, 凸分解碰撞(可进门)"
+
+# ── 源文件 ───────────────────────────────────────────
+source:
+  blend: model.blend
+  meshes:
+    - file: source/cabin.glb
+      instance: "0"
+
+# ── 物理参数（层②）───────────────────────────────────
+mass: 600.0                    # 木屋常识估值, brief 未给, 显式告知
+inertia: auto                  # 需 sdf>=1.11 (A2)
+static: false
+
+# ── 几何（层②）───────────────────────────────────────
+geometry:
+  size: [2.4400, 3.5779, 3.3269]   # 含屋檐/屋脊/门窗凸出的实测 bbox (V4 对账口径)
+
+# ── collision（层②）──────────────────────────────────
+collision:
+  type: mesh
+  optimization: convex_decomposition   # 用户拍板: 凹体真实接触, 可进门
+  convex_decomposition:
+    max_convex_hulls: 16               # SDF 规范默认 (A3)
+    voxel_resolution: 200000           # SDF 规范默认 (A3)
+
+# ── 坐标与轴向 ───────────────────────────────────────
+frame:
+  origin: center
+  # visual_pose 省略 = 层①默认 roll +90° (B1)
+
+# ── Gazebo 输出选项 ──────────────────────────────────
+gazebo:
+  sdf_version: "1.11"
+
+# ── world 场景（可选）────────────────────────────────
+world:
+  name: cabin_world
+  layout:
+    type: grid
+    cols: 1
+    # pitch 默认 = 2×max(size) ≈ 7.16m; 单实例无影响
+  ground: true
+  sun: true
+  plugins: default
