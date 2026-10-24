@@ -4,3 +4,4 @@ __pycache__/
 *.blend1
 nohup.out
 *.log
+.gh-config/
