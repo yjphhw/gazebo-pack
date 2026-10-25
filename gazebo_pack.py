@@ -66,6 +66,9 @@ IDX_FMT = {5121: "B", 5123: "H", 5125: "I"}       # 索引三种无符号整型
 OPT_ENUM = {"convex_hull", "convex_decomposition", "none"}    # §3/A3
 MODELS_DIR = "gazebo_models"              # §7: 只写这两个目录 **■ 相对运行目录**
 WORLDS_DIR = "worlds"
+PREVIEW_NAME = "preview.png"              # §5.1: 资产包预览图 → 产物 thumbnails/1.png
+THUMB_MIN_SIDE = 128                      # V13: 缩略图最小边 (Fuel 轮播图)
+THUMB_MAX_MB = 5                          # V13: 单图体积上限
 
 E, W, I = "❌", "⚠", "ℹ"                  # 三种打印级别
 
@@ -337,7 +340,33 @@ def apply_defaults(m):
     return d
 
 
-# ============================== 校验 (V1~V11) ==============================
+# ============================== 校验 (V1~V13) ==============================
+def png_size(path):
+    """读 PNG IHDR 宽高; 非 PNG 返回 None."""
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(24)
+        if head[:8] != b"\x89PNG\r\n\x1a\n" or head[12:16] != b"IHDR":
+            return None
+        return struct.unpack(">II", head[16:24])
+    except OSError:
+        return None
+
+
+def preview_check(pkg_dir):
+    """V13 (§5.1): 资产包 preview.png. 返回 (err|None, 绝对路径|None)."""
+    p = os.path.join(pkg_dir, PREVIEW_NAME)
+    if not os.path.exists(p):
+        return None, None                     # 缺席只警告, 不拦路
+    dims = png_size(p)
+    if dims is None:
+        return f"{PREVIEW_NAME} 不是合法 PNG → 用 render_preview.py 重渲", None
+    if min(dims) < THUMB_MIN_SIDE:
+        return (f"{PREVIEW_NAME} {dims[0]}×{dims[1]} 过小: 最小边 "
+                f"{min(dims)}px < {THUMB_MIN_SIDE}px"), None
+    if os.path.getsize(p) > THUMB_MAX_MB * 1024 * 1024:
+        return (f"{PREVIEW_NAME} 超过 {THUMB_MAX_MB}MB (Fuel 轮播图用, 降分辨率/重压缩)"), None
+    return None, p
 def validate_package(pkg_dir, want_world):
     """资产包体检. ➔ (issues=[(级别,编号,消息)], d=补齐后的视图, insts, scans)
     issues 里只要有一条 ❌, build 就拒绝动工."""
@@ -473,6 +502,14 @@ def validate_package(pkg_dir, want_world):
         werr = world_layout_errors(d, len(insts))
         for msg in werr:
             bad("V11", msg)
+
+    # ---- V13 预览图 (§5.1: 存在则打包成产物 thumbnails/1.png) ----
+    perr, _ppath = preview_check(pkg_dir)
+    if perr:
+        bad("V13", perr)
+    elif _ppath is None:
+        warn("V13", f"缺 {PREVIEW_NAME}: 产物将没有 thumbnails/1.png (Fuel 展示页会空白; "
+                    "建议补 render_preview.py 渲一张, 仍会打包)")
 
     return issues, d, insts, scans
 
@@ -755,6 +792,14 @@ def build_package(pkg_dir, want_world):
             fh.write(render_sdf(d, inst, glb_name))
         with open(os.path.join(out_dir, "model.config"), "w", encoding="utf-8") as fh:
             fh.write(render_config(d, inst))
+        # §5.1/A5: 资产包 preview.png → 产物 thumbnails/1.png (Fuel 规范, 可空)
+        perr, ppath = preview_check(pkg_dir)
+        tdir = os.path.join(out_dir, "thumbnails")
+        if ppath:
+            os.makedirs(tdir, exist_ok=True)
+            shutil.copyfile(ppath, os.path.join(tdir, "1.png"))
+        elif os.path.isdir(tdir):
+            shutil.rmtree(tdir)               # 覆盖式重写: preview 撤了缩略图也要消失
         total_bytes += sum(os.path.getsize(os.path.join(out_dir, x))
                            for x in ("model.sdf", "model.config", glb_name))
         written.append(model_name)

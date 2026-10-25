@@ -27,6 +27,18 @@ sdformat14 支持。出处：`sdf/1.11/inertial.sdf` 的 `attribute auto`。mani
 
 **A4. 用户环境**：Gazebo Harmonic（`gz sim`，本机 8.15.0）。
 
+**A5. 模型目录 = Fuel 上传规范**：官方结构 `materials/ meshes/ thumbnails/ model.config
+model.sdf`。`thumbnails/` 放 **`1.png`~`5.png`**（同一模型不同角度，Fuel 网页轮播图），
+**本地 gz sim 完全忽略该目录**。出处：gz-sim 官方教程 `mesh_to_fuel.md`（"Thumbnails are
+.png files named 1 through 5"）+ 本机实锤 `/opt/ros/jazzy/share/ros_gz_sim_demos/models/
+cardboard_box/thumbnails/1..5.png`。本项目约定：资产包 `preview.png` → 打包时复制为产物
+`thumbnails/1.png`（V13；preview 缺席只 ⚠️）。
+
+**A6. 本工具与 Fuel 的差异**：产物目录用 `source glb 同目录同名`（而非 Fuel 的 `meshes/`），
+贴图内嵌 glb（而非 `materials/textures/`）——为的是单文件分发 + 零外部引用（A1/D4）。
+**如需上传 Fuel，需转换**：glb 挪 `meshes/`、model.sdf 的 `<uri>` 改
+`model://<name>/meshes/…`、preview 改名补齐 `thumbnails/1..5.png`。未做，也不在 v1 做。
+
 ---
 
 ## B. 坐标系与轴向（本项目实证）

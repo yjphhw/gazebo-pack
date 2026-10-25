@@ -58,8 +58,8 @@ gz sim -r worlds/coke_bottle_world.sdf                     # 红色可乐瓶立�
 - **全脚本化可复现**：每个模型的几何与贴图都是 Python 脚本生成的——
   改个 `SIZE = (…)` 常量重跑即可，不靠手动 Blender 操作，可 diff、可回滚。
 - **契约先行**：尺寸 / 质量 / 碰撞 / 布局集中在一个 `manifest.yaml`，没有隐藏状态。
-- **V1–V12 硬校验**：水密、有向体积、尺寸与 glb 实测 bbox 对账（容差每轴
-  max(5%, 2cm)）、贴图必须内嵌、原点策略……任何 ❌ **拒绝打包**并打印原因。
+- **V1–V13 硬校验**：水密、有向体积、尺寸与 glb 实测 bbox 对账（容差每轴
+  max(5%, 2cm)）、贴图必须内嵌、原点策略、预览图合法 PNG……任何 ❌ **拒绝打包**并打印原因。
 - **物理真稳（实测筛选）**：`mesh`/`box`/`primitives` 碰撞 + auto 惯量。
   例：12t 公交 45s 无头仿真零漂移（选 box）；Tesla Model 3 四轮圆柱碰撞，
   静止 z = 0.71999999996，恰好等于理论高度。
@@ -81,6 +81,7 @@ gz sim -r worlds/coke_bottle_world.sdf                     # 红色可乐瓶立�
 │   ├── bus/                   ← 城市公交 10.5×2.5×3.05m, 12t, 动态, box 碰撞
 │   ├── tesla/                 ← Tesla Model 3 4.69×1.85×1.44m, 动态, primitives(盒+4轮)
 │   ├── falcon9/               ← 猎鹰 9 火箭
+│   ├── starship/              ← SpaceX 星舰全栈 9m×121m 原尺寸, 动态
 │   ├── coke_bottle/           ← 可乐瓶 0.08×0.08×0.25m, 动态, mesh（示例起点）
 │   ├── chair/  table/  shelf/ ← 家具类
 │   ├── cabin/  cabin2/        ← 小屋（两种变体）
@@ -89,6 +90,7 @@ gz sim -r worlds/coke_bottle_world.sdf                     # 红色可乐瓶立�
 │
 ├── gazebo_models/             ← ② 产物（不进 git，build 后生成，可随时删）
 │   └── <name>_<inst>/         ←    model.sdf + model.config + <name>_<inst>.glb
+│       └── thumbnails/1.png   ←    由资产包 preview.png 复制（Fuel 轮播图规范）
 └── worlds/                    ← ② 产物（不进 git）
     └── <name>_world.sdf       ←    可直接 gz sim 的场景
 ```

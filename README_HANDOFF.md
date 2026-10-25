@@ -16,6 +16,7 @@ assets/<name>/                 ← 交接物（源）
         │  两条命令
         ▼
 gazebo_models/<name>_XX/       ← 产物：model.sdf + model.config + <name>_XX.glb
+│                                (+ thumbnails/1.png，若资产包有 preview.png)
 worlds/<name>_world.sdf        ← 产物：可直接 gz sim 跑的场景
 ```
 
@@ -76,7 +77,7 @@ python3 gazebo_pack.py build assets/<name> --world                  # ② 校验
 
 - ① 读 `model.blend`，把每个网格对象导出为 `source/<对象名>.glb`；按
   `manifest.frame.origin` 自动归位；检查贴图是否已 pack。
-- ② 读 `manifest.yaml`，跑 V1–V12；任何 ❌ 都拒绝打包并打印原因；通过后写
+- ② 读 `manifest.yaml`，跑 V1–V13；任何 ❌ 都拒绝打包并打印原因；通过后写
   `gazebo_models/`，manifest 里有 `world:` 段时再写 `worlds/`。
 - 只检查不写盘：`python3 gazebo_pack.py validate assets/<name>`。
 - 批量：`python3 gazebo_pack.py build assets/ --all`。

@@ -179,10 +179,15 @@ world:
 gazebo_models/<name>_<instance>/
 ├── model.config             # name/version/入口 sdf + description
 ├── model.sdf                # §5.3 结构
-└── <name>_<instance>.glb    # 同目录同名；visual URI = model://<name>_<instance>/…
+├── <name>_<instance>.glb    # 同目录同名；visual URI = model://<name>_<instance>/…
+└── thumbnails/1.png         # 资产包 preview.png 存在时复制而来（Fuel 规范 A5）
 worlds/<world.name>.sdf      # world 块存在时
 ```
 同族多实例 = 同一资产包展开，**不允许 24 个文件夹各自为政**。
+
+`thumbnails/` 是 Fuel（app.gazebosim.org）上传规范的可选目录：`1.png`~`5.png`
+按序作为模型网页轮播图；本地 `gz sim` 完全忽略它。本工具约定：资产包的
+`preview.png` → 产物 `thumbnails/1.png`（缺 preview 只 ⚠️ 不拦路，见 V13）。
 
 ### 5.2 原点策略（validator 口径）
 - `center`：glb 顶点 AABB 中心距原点 ≤ **1mm**；
@@ -244,6 +249,7 @@ python3 gazebo_pack.py build    assets/<name> --world   # 额外生成 world
 | V10 | mass>0；explicit 惯量六项齐全 | ❌ | C1 |
 | V11 | layout.poses 数 = 实例数；z=auto 换算 | ❌ | §5.4 |
 | V12 | 输出清单 + 体积 + 启动三步提示 | ℹ️ | F |
+| V13 | `preview.png` 若存在须为合法 PNG、最小边 ≥128px、≤5MB；打包时复制为产物 `thumbnails/1.png`（缺席 ⚠️） | ⚠️/❌ | A5 |
 
 ---
 
