@@ -237,7 +237,7 @@ def make_mat(name, metallic, roughness):
 
 
 mat_body = make_mat("coke_body", 0.0, 0.32)
-mat_cap = make_mat("coke_cap", 0.85, 0.28)
+mat_cap = make_mat("coke_cap", 0.2, 0.28)  # D6: gz 无 IBL
 obj.data.materials.append(mat_body)
 obj.data.materials.append(mat_cap)
 

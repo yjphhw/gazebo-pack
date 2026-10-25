@@ -250,6 +250,7 @@ python3 gazebo_pack.py build    assets/<name> --world   # 额外生成 world
 | V11 | layout.poses 数 = 实例数；z=auto 换算 | ❌ | §5.4 |
 | V12 | 输出清单 + 体积 + 启动三步提示 | ℹ️ | F |
 | V13 | `preview.png` 若存在须为合法 PNG、最小边 ≥128px、≤5MB；打包时复制为产物 `thumbnails/1.png`（缺席 ⚠️） | ⚠️/❌ | A5 |
+| V14 | 每个 primitive 必须有 material（无 → 默认材质 metallic=1 必黑）；metallicFactor >0.2 → 警告（gz 无 IBL 金属发黑） | ❌/⚠️ | D6 |
 
 ---
 

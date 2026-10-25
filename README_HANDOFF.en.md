@@ -81,7 +81,7 @@ python3 gazebo_pack.py build assets/<name> --world                  # 2) validat
 
 - Step 1 reads `model.blend`, exports every mesh object to `source/<object_name>.glb`,
   re-centers it per `manifest.frame.origin`, and checks that textures are packed.
-- Step 2 reads `manifest.yaml`, runs checks V1–V13; any ❌ refuses to package and
+- Step 2 reads `manifest.yaml`, runs checks V1–V14; any ❌ refuses to package and
   prints the reason; on success it writes `gazebo_models/`, plus `worlds/` when the
   manifest has a `world:` block.
 - Validate only, write nothing: `python3 gazebo_pack.py validate assets/<name>`.

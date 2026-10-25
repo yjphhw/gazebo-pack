@@ -122,7 +122,7 @@ if bsdf is None:
         or nt.nodes.new("ShaderNodeOutputMaterial")
     nt.links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
 bsdf.inputs["Base Color"].default_value = (0.70, 0.72, 0.75, 1.0)
-bsdf.inputs["Metallic"].default_value = 0.35
+bsdf.inputs["Metallic"].default_value = 0.15  # D6: gz 无 IBL, metallic>0.2 发黑
 bsdf.inputs["Roughness"].default_value = 0.38
 mesh.materials.append(mat)
 mat.diffuse_color = (0.72, 0.74, 0.77, 1.0)

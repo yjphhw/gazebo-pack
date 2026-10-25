@@ -107,6 +107,10 @@ mat.use_nodes = True
 bsdf = mat.node_tree.nodes["Principled BSDF"]
 bsdf.inputs["Base Color"].default_value = (0.80, 0.66, 0.44, 1.0)  # 白蜡木浅黄
 bsdf.inputs["Roughness"].default_value = 0.55
+# 坑: EXACT union 给主动对象留下 material=None 空槽, 全部面 material_index=0 指向空槽
+# → 导出 glb 无材质 → Gazebo 按 glTF 默认材质 (metallic=1) 渲染成黑色 (PACK_NOTES D6)。
+# 清空槽再挂, 保证 slot0=ash 且全部面绑上。
+active.data.materials.clear()
 active.data.materials.append(mat)
 
 # ---- 自检: 报告外包络 (应 0.450×0.450×0.900, z_min=0) ----
@@ -117,9 +121,9 @@ print(f"MODEL bbox: {max(xs)-min(xs):.4f} x {max(ys)-min(ys):.4f} x "
       f"{max(zs)-min(zs):.4f}, z_min={min(zs):.4f}, verts={len(active.data.vertices)}")
 
 # ---- 存 blend (导出器读它; 世界原点先不归位, 归位是导出器的职责) ----
+# 路径以脚本位置定位, 不依赖 cwd (原实现 cwd 变了会存错地方)
 import os
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "chair")
-os.makedirs(out, exist_ok=True)
+out = os.path.dirname(os.path.abspath(__file__))
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(out, "model.blend"))
 print("BLEND_SAVED:", os.path.join(out, "model.blend"))
 

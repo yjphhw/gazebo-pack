@@ -37,7 +37,7 @@ def new_mat(name):
     return m, bsdf
 
 m_skin, b_skin = new_mat("starship_skin")
-b_skin.inputs["Metallic"].default_value = 0.8
+b_skin.inputs["Metallic"].default_value = 0.1   # D6: gz 无 IBL, 金属感靠贴图 sheen
 b_skin.inputs["Roughness"].default_value = 0.32
 tex = m_skin.node_tree.nodes.new("ShaderNodeTexImage")
 img_path = os.path.join(HERE, "textures", "skin.png")
@@ -46,7 +46,7 @@ m_skin.node_tree.links.new(tex.outputs["Color"], b_skin.inputs["Base Color"])
 
 m_dark, b_dark = new_mat("starship_dark")
 b_dark.inputs["Base Color"].default_value = (0.04, 0.04, 0.045, 1)
-b_dark.inputs["Metallic"].default_value = 0.3
+b_dark.inputs["Metallic"].default_value = 0.05
 b_dark.inputs["Roughness"].default_value = 0.55
 
 

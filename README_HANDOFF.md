@@ -77,7 +77,7 @@ python3 gazebo_pack.py build assets/<name> --world                  # ② 校验
 
 - ① 读 `model.blend`，把每个网格对象导出为 `source/<对象名>.glb`；按
   `manifest.frame.origin` 自动归位；检查贴图是否已 pack。
-- ② 读 `manifest.yaml`，跑 V1–V13；任何 ❌ 都拒绝打包并打印原因；通过后写
+- ② 读 `manifest.yaml`，跑 V1–V14；任何 ❌ 都拒绝打包并打印原因；通过后写
   `gazebo_models/`，manifest 里有 `world:` 段时再写 `worlds/`。
 - 只检查不写盘：`python3 gazebo_pack.py validate assets/<name>`。
 - 批量：`python3 gazebo_pack.py build assets/ --all`。

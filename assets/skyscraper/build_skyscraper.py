@@ -141,8 +141,8 @@ def make_mat(name, color=None, metallic=0.0, roughness=0.4, texture=False):
 
 
 mat_glass = make_mat("facade_glass", metallic=0.15, roughness=0.22, texture=True)
-mat_roof = make_mat("roof_metal", color=(0.16, 0.18, 0.20), metallic=0.50, roughness=0.42)
-mat_spire = make_mat("spire_metal", color=(0.63, 0.67, 0.71), metallic=0.85, roughness=0.25)
+mat_roof = make_mat("roof_metal", color=(0.16, 0.18, 0.20), metallic=0.15, roughness=0.42)
+mat_spire = make_mat("spire_metal", color=(0.63, 0.67, 0.71), metallic=0.2, roughness=0.25)
 mesh.materials.clear()                    # 清掉 primitive_cube_add 留下的空槽
 for m in (mat_glass, mat_roof, mat_spire):
     mesh.materials.append(m)

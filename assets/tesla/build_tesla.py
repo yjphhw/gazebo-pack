@@ -134,7 +134,7 @@ bpc.free()
 me.update()
 
 # ---- 材质 ----
-def make_mat(key, img, rough=0.35, metal=0.6):
+def make_mat(key, img, rough=0.35, metal=0.2):  # D6: gz 无 IBL, metallic>0.2 发黑
     m = bpy.data.materials.new("tm3_" + key)
     m.use_nodes = True
     nt = m.node_tree
@@ -153,9 +153,9 @@ def make_mat(key, img, rough=0.35, metal=0.6):
 
 
 MATS = {"side": make_mat("side", "side.png"),
-        "front": make_mat("front", "front.png", 0.3, 0.4),
-        "rear": make_mat("rear", "rear.png", 0.3, 0.4),
-        "roof": make_mat("roof", "roof.png", 0.25, 0.5),
+        "front": make_mat("front", "front.png", 0.3, 0.15),
+        "rear": make_mat("rear", "rear.png", 0.3, 0.15),
+        "roof": make_mat("roof", "roof.png", 0.25, 0.2),
         "tire": make_mat("tire", "wheel.png", 0.9, 0.0)}
 IDX = {k: i for i, k in enumerate(MATS)}
 for k in ("side", "front", "rear", "roof", "tire"):

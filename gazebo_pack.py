@@ -64,6 +64,7 @@ TOL_SIZE_ABS = 0.02                       # V4 尺寸容差 2cm (二者取宽)
 COMP_FLOAT = 5126                         # glTF componentType FLOAT
 IDX_FMT = {5121: "B", 5123: "H", 5125: "I"}       # 索引三种无符号整型
 OPT_ENUM = {"convex_hull", "convex_decomposition", "none"}    # §3/A3
+TOL_METALLIC_MAX = 0.2                      # V14: gz 无 IBL, 金属度上限 (D6)
 MODELS_DIR = "gazebo_models"              # §7: 只写这两个目录 **■ 相对运行目录**
 WORLDS_DIR = "worlds"
 PREVIEW_NAME = "preview.png"              # §5.1: 资产包预览图 → 产物 thumbnails/1.png
@@ -240,6 +241,27 @@ def glb_external_refs(gjson):
         if buf.get("uri"):
             bad.append(f"buffer[{i}] 外部引用 {buf['uri'][:48]}")
     return bad
+
+
+def glb_material_report(gjson):
+    """V14 材质可渲染性 (D6): gz ogre2 无环境贴图 →
+    ① 无 material 的 primitive 走 glTF 默认材质 (metallic=1) → 渲染成黑色;
+    ② metallicFactor 高的材质同样发黑 (金属无漫反射, 无 IBL 可反).
+    返回 (无材质 primitive 数, metallic>上限 的材质名列表)."""
+    mats = gjson.get("materials", [])
+    no_mat = 0
+    for mesh in gjson.get("meshes", []):
+        for prim in mesh.get("primitives", []):
+            if "material" not in prim:
+                no_mat += 1
+    hi = []
+    for i, m in enumerate(mats):
+        pbr = m.get("pbrMetallicRoughness", {})
+        # glTF 规范: metallicFactor 缺省 = 1.0
+        mf = pbr.get("metallicFactor", 1.0)
+        if mf > TOL_METALLIC_MAX + 1e-3:  # 浮点容差: Blender 0.2 导出成 0.200000003
+            hi.append(f"{m.get('name') or 'material' + str(i)}({mf:.2f})")
+    return no_mat, hi
 
 
 def watertight_report(tris):
@@ -464,6 +486,14 @@ def validate_package(pkg_dir, want_world):
             if flipped:
                 bad("V7", f"{tag} {flipped} 条边两侧三角形同向 (法线不一致), "
                           f"体积积分符号会错 → Blender 里 Normal Align 后重导")
+        # V14 材质可渲染性 (D6: gz ogre2 无 IBL; 无材质=默认metallic1黑; 高metallic黑)
+        no_mat, hi_metal = glb_material_report(scan["gjson"])
+        if no_mat:
+            bad("V14", f"{tag} {no_mat} 个 primitive 无 material → Gazebo 按 glTF 默认材质"
+                       f" (metallic=1) 渲染成黑色 (检查 Blender 材质槽是否留了 None 空槽)")
+        if hi_metal:
+            warn("V14", f"{tag} metallic>{TOL_METALLIC_MAX:g} 的材质: {', '.join(hi_metal)}"
+                        f" — gz 无环境贴图, 金属面发黑 (D6), 建议 ≤{TOL_METALLIC_MAX:g}")
 
     # blend 若声明则查存在 (glb 才是产物, blend 只是返工源, 缺了仅警告)
     if d["blend"] and not os.path.exists(os.path.join(pkg_dir, d["blend"])):

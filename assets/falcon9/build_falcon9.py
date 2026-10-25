@@ -276,11 +276,11 @@ def make_mat(name, image=None, color=None, metallic=0.0, roughness=0.4):
 
 mesh.materials.clear()
 mesh.materials.append(make_mat("stage1_white", IMAGES["stage1"], metallic=0.05, roughness=0.35))
-mesh.materials.append(make_mat("interstage_carbon", IMAGES["carbon"], metallic=0.25, roughness=0.45))
+mesh.materials.append(make_mat("interstage_carbon", IMAGES["carbon"], metallic=0.2, roughness=0.45))
 mesh.materials.append(make_mat("stage2_white", IMAGES["stage2"], metallic=0.05, roughness=0.35))
 mesh.materials.append(make_mat("fairing_white", IMAGES["fairing"], metallic=0.05, roughness=0.30))
-mesh.materials.append(make_mat("engine_metal", color=(0.11, 0.11, 0.12), metallic=0.85, roughness=0.40))
-mesh.materials.append(make_mat("grid_fin", IMAGES["fins"], metallic=0.70, roughness=0.35))
+mesh.materials.append(make_mat("engine_metal", color=(0.11, 0.11, 0.12), metallic=0.2, roughness=0.40))
+mesh.materials.append(make_mat("grid_fin", IMAGES["fins"], metallic=0.2, roughness=0.35))
 mesh.materials.append(make_mat("raceway", color=(0.72, 0.72, 0.70), metallic=0.10, roughness=0.45))
 for poly, mi in zip(mesh.polygons, face_mats):
     poly.material_index = mi

@@ -82,6 +82,14 @@ Gazebo 里 visual 相对 link 原点错位（本项目实测错 0.375m）。修�
 - **D3** 贴图 colorspace 保持默认 sRGB，**不要改 Non-Color**；glTF 按 sRGB 编码。
 - **D4** 程序化节点材质（noise/wave）导出 glTF 会丢——进 Gazebo 的材质必须先烘成 png。
 - **D5** 贴图 `pack()` 进 .blend，文件搬家不丢图。
+- **D6** **gz ogre2 没有环境贴图（IBL）**：PBR 金属面没有漫反射、全靠反射环境——无环境可反 →
+  **高 metallic 在 Gazebo 里渲染成近黑色，且加方向光也救不回**（灯只给一个高光点）。Blender
+  预览有世界环境所以正常——**预览好看 ≠ Gazebo 正常**。规则：metallic ≤ 0.2（V14 ⚠️），
+  "金属感"用贴图里画的 sheen 高光带表达。同坑变体：primitive **无 material** → glTF 默认材质
+  metallic=1.0 → 必黑（Blender EXACT union 会留 material=None 空槽、全面绑空槽是典型成因；
+  修法 `me.materials.clear()` 再挂材质，V14 ❌）。
+  出处：实测 chair（无材质→黑）与 starship（metallic 0.8→黑、0.1 正常）；gz-rendering8
+  HlmsPbs 无默认 envmap（`Ogre2Material` 有 Metalness 通道但环境项为空）。
 
 ---
 
