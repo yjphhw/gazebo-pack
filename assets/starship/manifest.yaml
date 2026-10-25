@@ -1,0 +1,40 @@
+# SpaceX Starship 全栈 — 资产包交接单（MANIFEST_SPEC v1.0）
+# brief: "spacex 星舰，纹理精美，原尺寸，1 个动态，collision decomposition"
+# 原尺寸: 直径 9m；booster(Super Heavy) 71m + Ship 50m = 总高 121m。
+# size 按 glb 实际 bounds（含襟翼/栅格翼外伸）：x 10.7 / y 10.6 / z 121。
+schema_version: 1
+kind: model-package
+name: starship
+description: "SpaceX Starship 全栈（Ship + Super Heavy），9m×121m 不锈钢箭体，黑色防热瓦鼻锥，SPACEX 字样"
+
+source:
+  blend: model.blend
+  meshes:
+    - file: source/starship.glb
+      instance: "00"          # 引号必加（YAML 00 会被读成 0）
+
+mass: 500000.0                # kg ≈ 500t 干重（加注满推进剂约 5000t，仿真按空重）
+inertia: auto                 # mesh 水密 → 体积积分（C1/C2）
+static: false                 # brief: 1 个动态
+
+geometry:
+  size: [10.7, 10.6, 121.0]   # 与 glb bounds 对账（V4）
+
+collision:
+  type: mesh
+  optimization: convex_decomposition   # brief: decomposition（VHACD 分凸包，翼面独立）
+
+frame:
+  origin: center              # glb AABB 中心 = 原点（V5）
+
+gazebo:
+  sdf_version: "1.11"
+
+world:
+  name: starship_world
+  layout:
+    type: grid
+    cols: 1                   # 单件，居中；z auto → 60.5 使尾部贴地
+  ground: true
+  sun: true
+  plugins: default
